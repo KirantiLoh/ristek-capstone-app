@@ -3,8 +3,8 @@ import React from 'react'
 
 const HomeScreen = () => {
     return (
-        <View>
-            <Text>HomeScreen</Text>
+        <View className='w-full h-screen'>
+            <Text className='text-2xl font-semibold'>HomeScreen</Text>
         </View>
     )
 }
