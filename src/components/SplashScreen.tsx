@@ -3,8 +3,8 @@ import React from 'react'
 
 const SplashScreen = () => {
     return (
-        <View>
-            <Text>SplashScreen</Text>
+        <View className='flex flex-col items-center justify-center w-full h-screen'>
+            <Text className='text-3xl font-semibold'>Capstone</Text>
         </View>
     )
 }
