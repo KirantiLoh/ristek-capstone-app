@@ -10,6 +10,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import LoginScreen from './src/screens/auth/LoginScreen';
 import RegisterScreen from './src/screens/auth/RegisterScreen';
 import { AuthProvider, useAuth } from './src/context/AuthContext';
+import CommentScreen from './src/screens/CommentScreen';
 
 const Screens = () => {
   const Tab = createBottomTabNavigator<AuthenticatedParamList>();
@@ -88,11 +89,13 @@ const Screens = () => {
 
 export default function App() {
   return (
-    <NavigationContainer>
-      <AuthProvider>
-        <Screens />
-      </AuthProvider>
-    </NavigationContainer>
-  );
+    // <NavigationContainer>
+    //   <AuthProvider>
+    //     <Screens />
+    //   </AuthProvider>
+    // </NavigationContainer>
+    // <HomeScreen></HomeScreen>
+    <CommentScreen/>
+    );
 }
 
