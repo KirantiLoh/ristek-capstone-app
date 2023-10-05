@@ -16,14 +16,12 @@ const AuthContext = createContext<{
     login: (username: string, password: string) => void,
     register: (username: string, password: string, email: string) => void,
     logout: () => void,
-    refreshToken: () => Promise<void>,
 }>({
     accessToken: "",
     user: { username: "", email: "" },
     login: undefined as unknown as (username: string, password: string) => void,
     logout: undefined as unknown as () => void,
     register: undefined as unknown as (username: string, password: string, email: string) => void,
-    refreshToken: undefined as unknown as () => Promise<void>,
 })
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
@@ -36,7 +34,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     const login = async (username: string, password: string) => {
         try {
-            const res = await axios.post(`http://192.168.0.109:8080/v1/auth/login`, { username, password }, {
+            const res = await axios.post(`${process.env.EXPO_PUBLIC_BACKEND_URL}/api/auth/login`, { username, password }, {
                 headers: {
                     "Content-Type": "application/json",
                 }
@@ -45,7 +43,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             const data: ITokens = await res.data;
             const user: { username: string, email: string } = jwt_decode(data.access_token);
             setUser({ username: user.username, email: user.email });
-            await SecureStore.setItemAsync("refresh_token", data.refresh_token);
             setAccessToken(data.access_token);
         } catch (error) {
             const err = error as AxiosError;
@@ -57,7 +54,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
 
     const register = async (username: string, password: string, email: string) => {
-        const res = await axios.post(`http://192.168.0.109:8080/v1/auth/register`, { username, password, email }, {
+        const res = await axios.post(`${process.env.EXPO_PUBLIC_BACKEND_URL}/api/auth/register`, { username, password, email }, {
             headers: {
                 "Content-Type": "application/json",
             }
@@ -68,27 +65,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
 
     const refreshToken = async () => {
-        const refreshToken = await SecureStore.getItemAsync("refresh_token")
-        if (!refreshToken) return
-        try {
-            const res = await axios.post(`http://192.168.0.109:8080/v1/auth/refresh`, { refresh_token: refreshToken }, {
-                headers: {
-                    "Content-Type": "application/json",
-                }
-            });
-            if (res.status !== 200) return;
-            const data: ITokens = await res.data;
-            const user: { username: string, email: string } = jwt_decode(data.access_token);
-            setUser({ username: user.username, email: user.email });
-            await SecureStore.setItemAsync("refresh_token", data.refresh_token);
-            setAccessToken(data.access_token);
-        } catch (error) {
-            const err = error as AxiosError;
-            console.error(err)
-        }
-        finally {
+        const access_token = await SecureStore.getItemAsync("access_token")
+        if (!access_token) {
+            navigator.navigate('Login');
             setLoading(false);
+            return;
         }
+        setAccessToken(access_token);
+        setLoading(false);
+        
     }
 
     const logout = () => {
@@ -106,12 +91,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         login,
         register,
         logout,
-        refreshToken,
     }
 
     return (
         <AuthContext.Provider value={contextValue}>
             {!loading ? children : <SplashScreen />}
+            {/* {children} */}
         </AuthContext.Provider>
     )
 }
